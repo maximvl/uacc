@@ -8,6 +8,7 @@
 start() -> application:start(uacc).
 stop() -> application:stop(uacc).
 
+-spec add_record(atom(), [atom()]) -> ok.
 add_record(Name, Fields) ->
   uacc_storage:add_record(Name, Fields).
 
@@ -24,11 +25,6 @@ data_type(D) when is_tuple(D) andalso is_atom(element(1, D)) ->
   end;
 data_type(D) when is_tuple(D) -> tuple;
 data_type(X) -> throw({not_supported, X}).
-
-position(E, L) -> position(E, L, 1).
-position(_, [], _) -> not_found;
-position(E, [E|_], N) -> N;
-position(E, [_|T], N) -> position(E, T, N+1).
 
 -spec modify(function(), list(), any()) -> any().
 modify(F, [], S) -> F(S);
@@ -67,10 +63,18 @@ modify(record, F, [K|Rest], S) when is_atom(K) ->
       setelement(N+1, S, Val)
   end.
 
+-spec list_split(integer(), list()) -> {list(), any(), list()}.
 list_split(N, L) -> list_split(N, L, []).
 list_split(1, [H|T], Acc) -> {lists:reverse(Acc), H, T};
 list_split(N, [H|T], Acc) -> list_split(N-1, T, [H|Acc]).
 
+-spec plist_split(any(), list()) -> {list(), any(), list()}.
 plist_split(K, L) -> plist_split(K, L, []).
 plist_split(K, [{K, V}|T], Acc) -> {lists:reverse(Acc), V, T};
 plist_split(K, [H|T], Acc) -> plist_split(K, T, [H|Acc]).
+
+-spec position(any(), list()) -> not_found | integer().
+position(E, L) -> position(E, L, 1).
+position(_, [], _) -> not_found;
+position(E, [E|_], N) -> N;
+position(E, [_|T], N) -> position(E, T, N+1).

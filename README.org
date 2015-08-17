@@ -1,0 +1,22 @@
+* uacc
+Universal access to Erlang data structures
+
+uacc provides an easy way to set/get values in nested data structures.
+
+* examples
+  #+BEGIN_SRC erlang
+    >uacc:modify(fun(X) -> 5 end, [1], [a, b, c, d]).
+    [5,b,c,d]
+    >uacc:modify(fun(X) -> 5 end, [1, 2], [[a, z, x], b, c, d]).
+    [[a,5,x],b,c,d]
+    >uacc:modify(fun(X) -> 5 end, [1, 2, v], [[a, [{x, 0}, {v, 10}, {y, 15}], x], b, c, d]).
+    [[a,[{x,0},{v,5},{y,15}],x],b,c,d]
+    >uacc:modify(fun(X) -> 5 end, [1, 2, v], [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d]).
+    [{a,[{x,0},{v,5},{y,15}],x},b,c,d]
+
+  #+END_SRC
+
+* TODO
+  - add universal getter
+  - add records support
+  - add custom data structures support?

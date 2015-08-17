@@ -1,0 +1,12 @@
+{application, uacc,
+ [
+  {description, "Universal access to data structures"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { uacc_app, []}},
+  {env, []}
+ ]}.

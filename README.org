@@ -5,7 +5,8 @@ uacc provides an easy way to set/get values in nested data structures.
 
 
 * examples
-  - getting value
+  - getting value:
+    
     uacc:get takes path into nested structure and returns found value
     #+BEGIN_SRC erlang
       > X = [[{b, c}, {a, {0, 1, 2}}, {c, 7}], []].
@@ -18,7 +19,8 @@ uacc provides an easy way to set/get values in nested data structures.
       0
     #+END_SRC
 
-  - updating value
+  - updating value:
+    
     uacc:update takes update function, path and nested structure.
     update function is called with found value as argument and returned value replaces original.
     #+BEGIN_SRC erlang

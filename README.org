@@ -22,7 +22,7 @@ uacc provides an easy way to set/get values in nested data structures.
   - updating value:
     
     uacc:update takes update function, path and nested structure.
-    update function is called with found value as argument and returned value replaces original.
+    update function is called with found value as argument and returns value to replace original one.
     #+BEGIN_SRC erlang
       > X = [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d].
       [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d]

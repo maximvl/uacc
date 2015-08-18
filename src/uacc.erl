@@ -1,7 +1,7 @@
 -module(uacc).
 
 -export([start/0, stop/0]).
--export([add_record/2, modify/3]).
+-export([add_record/2, update/3, get/2]).
 
 -type data_type() :: list | plist | dict | array | tuple | record.
 
@@ -26,40 +26,40 @@ data_type(D) when is_tuple(D) andalso is_atom(element(1, D)) ->
 data_type(D) when is_tuple(D) -> tuple;
 data_type(X) -> throw({not_supported, X}).
 
--spec modify(function(), list(), any()) -> any().
-modify(F, [], S) -> F(S);
-modify(F, [{T,K}|Path], S) when is_function(F, 1) ->
-  modify(T, F, [K|Path], S);
-modify(F, Path, S) when is_function(F, 1) andalso is_list(Path) ->
-  modify(data_type(S), F, Path, S).
+-spec update(function(), list(), any()) -> any().
+update(F, [], S) -> F(S);
+update(F, [{T,K}|Path], S) when is_function(F, 1) ->
+  update(T, F, [K|Path], S);
+update(F, Path, S) when is_function(F, 1) andalso is_list(Path) ->
+  update(data_type(S), F, Path, S).
 
--spec modify(data_type(), function(), list(), any()) -> any().
-modify(plist, F, [K|Rest], S) ->
+-spec update(data_type(), function(), list(), any()) -> any().
+update(plist, F, [K|Rest], S) ->
   {P1, S2, P2} = plist_split(K, S),
-  Val = modify(F, Rest, S2),
+  Val = update(F, Rest, S2),
   P1 ++ [{K, Val}|P2];
-modify(list, F, [N|Rest], S) when is_integer(N) ->
+update(list, F, [N|Rest], S) when is_integer(N) ->
   {P1, S2, P2} = list_split(N, S),
-  Val = modify(F, Rest, S2),
+  Val = update(F, Rest, S2),
   P1 ++ [Val|P2];
-modify(dict, F, [K|Rest], S) ->
+update(dict, F, [K|Rest], S) ->
   S2 = dict:fetch(K, S),
-  Val = modify(F, Rest, S2),
+  Val = update(F, Rest, S2),
   dict:store(K, Val, S);
-modify(array, F, [N|Rest], S) when is_integer(N) ->
+update(array, F, [N|Rest], S) when is_integer(N) ->
   S2 = array:get(N, S),
-  Val = modify(F, Rest, S2),
+  Val = update(F, Rest, S2),
   array:set(N, Val, S);
-modify(tuple, F, [N|Rest], S) when is_integer(N) ->
+update(tuple, F, [N|Rest], S) when is_integer(N) ->
   S2 = element(N, S),
-  Val = modify(F, Rest, S2),
+  Val = update(F, Rest, S2),
   setelement(N, S, Val);
-modify(record, F, [K|Rest], S) when is_atom(K) ->
+update(record, F, [K|Rest], S) when is_atom(K) ->
   {ok, Fields} = uacc_storage:get_fields(element(1, S)),
   case position(K, Fields) of
     not_found -> throw({not_found, K});
     N ->
-      Val = modify(F, Rest, element(N+1, S)),
+      Val = update(F, Rest, element(N+1, S)),
       setelement(N+1, S, Val)
   end.
 
@@ -78,3 +78,33 @@ position(E, L) -> position(E, L, 1).
 position(_, [], _) -> not_found;
 position(E, [E|_], N) -> N;
 position(E, [_|T], N) -> position(E, T, N+1).
+
+-spec get(list(), any()) -> any().
+get([], S) -> S;
+get([{T,K}|Rest], S) -> get(T, [K|Rest], S);
+get(Path, S) -> get(data_type(S), Path, S).
+
+-spec get(data_type(), list(), any()) -> any().
+get(plist, [K|Rest], S) ->
+    S2 = proplists:get_value(K, S),
+    get(Rest, S2);
+get(list, [N|Rest], S) when is_integer(N) ->
+    S2 = lists:nth(N, S),
+    get(Rest, S2);
+get(dict, [K|Rest], S) ->
+    S2 = dict:fetch(K, S),
+    get(Rest, S2);
+get(array, [N|Rest], S) when is_integer(N) ->
+    S2 = array:get(N, S),
+    get(Rest, S2);
+get(tuple, [N|Rest], S) when is_integer(N) ->
+    S2 = element(N, S),
+    get(Rest, S2);
+get(record, [K|Rest], S) when is_atom(K) ->
+    {ok, Fields} = uacc_storage:get_fields(element(1, S)),
+    case position(K, Fields) of
+        not_found -> throw(not_found);
+        N ->
+            S2 = element(N+1, S),
+            get(Rest, S2)
+    end.

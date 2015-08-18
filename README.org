@@ -3,20 +3,37 @@ Universal access to Erlang data structures
 
 uacc provides an easy way to set/get values in nested data structures.
 
+
 * examples
-  #+BEGIN_SRC erlang
-    >uacc:modify(fun(X) -> 5 end, [1], [a, b, c, d]).
-    [5,b,c,d]
-    >uacc:modify(fun(X) -> 5 end, [1, 2], [[a, z, x], b, c, d]).
-    [[a,5,x],b,c,d]
-    >uacc:modify(fun(X) -> 5 end, [1, 2, v], [[a, [{x, 0}, {v, 10}, {y, 15}], x], b, c, d]).
-    [[a,[{x,0},{v,5},{y,15}],x],b,c,d]
-    >uacc:modify(fun(X) -> 5 end, [1, 2, v], [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d]).
-    [{a,[{x,0},{v,5},{y,15}],x},b,c,d]
+  - getting value
+    uacc:get takes path into nested structure and returns found value
+    #+BEGIN_SRC erlang
+      > X = [[{b, c}, {a, {0, 1, 2}}, {c, 7}], []].
+      [[{b, c}, {a, {0, 1, 2}}, {c, 7}], []]
+      > uacc:get([1], X).
+      [{b,c},{a,{0,1,2}},{c,7}]
+      > uacc:get([1, a], X).
+      {0,1,2}
+      > uacc:get([1, a, 1], X).
+      0
+    #+END_SRC
 
-  #+END_SRC
+  - updating value
+    uacc:update takes update function, path and nested structure.
+    update function is called with found value as argument and returned value replaces original.
+    #+BEGIN_SRC erlang
+      > X = [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d].
+      [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d]
+      > uacc:update(fun(V) -> new end, [1], X).
+      [new,b,c,d]
+      > uacc:update(fun(V) -> new end, [1, 2], X).
+      [{a,new,x},b,c,d]
+      > uacc:update(fun(V) -> new end, [1, 2, v], X).
+      [{a,[{x,0},{v,new},{y,15}],x},b,c,d]
+    #+END_SRC
 
-* TODO
-  - add universal getter
-  - add records support
-  - add custom data structures support?
+*  todo
+  * add universal getter [DONE]
+  * add records support
+  * add custom data structures support?
+  * add tests

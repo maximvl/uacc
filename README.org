@@ -34,8 +34,42 @@ uacc provides an easy way to set/get values in nested data structures.
       [{a,[{x,0},{v,new},{y,15}],x},b,c,d]
     #+END_SRC
 
-*  todo
+  - records support:
+    
+    register a record for runtime operations:
+    #+BEGIN_SRC erlang
+      > uacc:add_record(my_rec, record_info(fields, my_rec)).
+      ok
+    #+END_SRC
+    
+    - get record fields:
+      #+BEGIN_SRC erlang
+        %% somewhere in sources:
+        %% -record(my_rec, {field1, field2, field3}).
+
+        > uacc:record_fields(my_rec).
+        [{1,'$record'},{2,field1},{3,field2},{4,field3}]
+      #+END_SRC
+
+    - create record from proplist:
+      #+BEGIN_SRC erlang
+        > R = uacc:make_record(my_rec, [{field2, f2}, {field3, zzz}]).
+        #my_rec{field1 = undefined,field2 = f2,field3 = zzz}
+      #+END_SRC
+
+    - convert record to proplist:
+      #+BEGIN_SRC erlang
+        > uacc:record_to_plist(R).
+        [{'$record',my_rec},
+         {field1,undefined},
+         {field2,f2},
+         {field3,zzz}]
+      #+END_SRC
+      
+
+* todo
   * add universal getter [DONE]
-  * add records support
+  * add records support [DONE]
+  * add tests [DONE]
   * add custom data structures support?
-  * add tests
+

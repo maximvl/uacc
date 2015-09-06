@@ -126,7 +126,7 @@ make_record(RecName, Defaults) ->
                      false -> throw({not_found, K})
                    end || {K, V} <- Defaults],
       L = length(Fields),
-      erlang:make_tuple(L, [], [{1, RecName} | RDefaults]);
+      erlang:make_tuple(L, undefined, [{1, RecName} | RDefaults]);
     {error, not_found} -> throw({not_found, RecName})
   end.
 

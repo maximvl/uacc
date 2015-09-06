@@ -38,15 +38,15 @@ uacc provides an easy way to set/get values in nested data structures.
     
     register a record for runtime operations:
     #+BEGIN_SRC erlang
+      %% somewhere in sources:
+      %% -record(my_rec, {field1, field2, field3}).
+
       > uacc:add_record(my_rec, record_info(fields, my_rec)).
       ok
     #+END_SRC
     
     - get record fields:
       #+BEGIN_SRC erlang
-        %% somewhere in sources:
-        %% -record(my_rec, {field1, field2, field3}).
-
         > uacc:record_fields(my_rec).
         [{1,'$record'},{2,field1},{3,field2},{4,field3}]
       #+END_SRC

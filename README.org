@@ -21,17 +21,17 @@ uacc provides an easy way to set/get values in nested data structures.
 
   - updating value:
     
-    uacc:update takes update function, path and nested structure.
+    uacc:update takes an value or update function, path and nested structure.
     update function is called with found value as argument and returns value to replace original one.
     #+BEGIN_SRC erlang
       > X = [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d].
       [{a, [{x, 0}, {v, 10}, {y, 15}], x}, b, c, d]
-      > uacc:update(fun(V) -> new end, [1], X).
+      > uacc:update(new, [1], X).
       [new,b,c,d]
-      > uacc:update(fun(V) -> new end, [1, 2], X).
+      > uacc:update(new, [1, 2], X).
       [{a,new,x},b,c,d]
-      > uacc:update(fun(V) -> new end, [1, 2, v], X).
-      [{a,[{x,0},{v,new},{y,15}],x},b,c,d]
+      > uacc:update(fun(V) -> V+1 end, [1, 2, v], X).
+      [{a,[{x,0},{v,11},{y,15}],x},b,c,d]
     #+END_SRC
 
   - records support:
@@ -43,6 +43,10 @@ uacc provides an easy way to set/get values in nested data structures.
 
       > uacc:add_record(my_rec, record_info(fields, my_rec)).
       ok
+      > uacc:get([field3], #my_rec{field3=15}).
+      15
+      > uacc:update(5, [field2], #my_rec{}).
+      #my_rec{field1 = undefined,field2 = 5,field3 = undefined}
     #+END_SRC
     
     - get record fields:

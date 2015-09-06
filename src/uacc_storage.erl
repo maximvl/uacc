@@ -29,12 +29,12 @@
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
--spec add_record(atom(), [atom()]) -> ok.
-add_record(Name, Fields) when is_atom(Name) andalso is_list(Fields) ->
+-spec add_record(any(), [atom()]) -> ok.
+add_record(Name, Fields) when is_list(Fields) ->
   gen_server:call(?SERVER, {add, Name, Fields}).
 
 -spec get_fields(atom()) -> {ok, [atom()]} | {error, not_found}.
-get_fields(Name) when is_atom(Name) ->
+get_fields(Name) ->
   case ets:lookup(?TAB, Name) of
     [{_, Fields}] -> {ok, Fields};
     [] -> {error, not_found}

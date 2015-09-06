@@ -1,0 +1,5 @@
+:name "uacc"
+:node-sname "uacc"
+:lib-dirs '("deps")
+:app-include-dirs '("include" "priv")
+:project-include-dirs '()

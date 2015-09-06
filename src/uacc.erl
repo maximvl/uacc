@@ -1,7 +1,8 @@
 -module(uacc).
 
 -export([start/0, stop/0]).
--export([add_record/2, update/3, get/2]).
+-export([add_record/2, update/3, get/2, record_fields/1]).
+-export([list_split/2, plist_split/2, position/2]).
 
 -type data_type() :: list | plist | dict | array | tuple | record.
 
@@ -65,11 +66,13 @@ update(record, F, [K|Rest], S) when is_atom(K) ->
 
 -spec list_split(integer(), list()) -> {list(), any(), list()}.
 list_split(N, L) -> list_split(N, L, []).
+list_split(_, [], _) -> throw(out_of_range);
 list_split(1, [H|T], Acc) -> {lists:reverse(Acc), H, T};
 list_split(N, [H|T], Acc) -> list_split(N-1, T, [H|Acc]).
 
 -spec plist_split(any(), list()) -> {list(), any(), list()}.
 plist_split(K, L) -> plist_split(K, L, []).
+plist_split(_, [], _) -> throw(not_found);
 plist_split(K, [{K, V}|T], Acc) -> {lists:reverse(Acc), V, T};
 plist_split(K, [H|T], Acc) -> plist_split(K, T, [H|Acc]).
 
@@ -108,3 +111,7 @@ get(record, [K|Rest], S) when is_atom(K) ->
             S2 = element(N+1, S),
             get(Rest, S2)
     end.
+
+record_fields(R) ->
+  {ok, F} = uacc_storage:get_fields(R),
+  F.
